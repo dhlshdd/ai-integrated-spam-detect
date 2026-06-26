@@ -167,12 +167,43 @@ const classifier = new NaiveBayesClassifier(DATASET_PATH);
 const server = http.createServer((req, res) => {
     // CORS Headers
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') {
         res.writeHead(200);
         res.end();
+        return;
+    }
+
+    // Serve static files on GET requests
+    if (req.method === 'GET') {
+        let filePath = req.url === '/' ? '/index.html' : req.url;
+        // Strip query parameters
+        filePath = filePath.split('?')[0];
+
+        const absolutePath = path.join(__dirname, 'website', filePath);
+        
+        fs.readFile(absolutePath, (err, content) => {
+            if (err) {
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end('Not Found');
+                return;
+            }
+
+            let contentType = 'text/html';
+            const ext = path.extname(absolutePath).toLowerCase();
+            if (ext === '.css') contentType = 'text/css';
+            else if (ext === '.js') contentType = 'application/javascript';
+            else if (ext === '.json') contentType = 'application/json';
+            else if (ext === '.png') contentType = 'image/png';
+            else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
+            else if (ext === '.svg') contentType = 'image/svg+xml';
+            else if (ext === '.zip') contentType = 'application/zip';
+
+            res.writeHead(200, { 'Content-Type': contentType });
+            res.end(content);
+        });
         return;
     }
 

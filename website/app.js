@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return 100; // Extreme risk
     }
 
-    const API_URL = 'https://ai-integrated-spam-detect.onrender.com/api.php';
+    const API_URL = '/api.php';
 
     async function runSimulation() {
         let url = simUrlInput.value.trim();
