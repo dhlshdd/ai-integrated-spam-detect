@@ -250,6 +250,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Run scanner simulation
     runSimBtn.addEventListener('click', runSimulation);
 
-    // Initial run
-    runSimulation();
+    // Set initial mockup UI state to idle/waiting
+    mockBadge.textContent = 'Idle';
+    mockBadge.className = 'mockup-badge';
+    mockScoreText.textContent = '--';
+    mockCircle.setAttribute('stroke-dasharray', '0, 100');
+    mockCircle.setAttribute('stroke', '#334155');
+    mockWarningsList.innerHTML = '<li class="safe-item" style="border-left-color: #3b82f6;">Enter a URL above and click "Scan Webpage Now" to run AI Sentinel analysis.</li>';
 });
