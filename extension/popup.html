@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Sentinel Dashboard</title>
+    <link rel="stylesheet" href="popup.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="shield">🛡️</div>
+                <h1>AI Sentinel</h1>
+            </div>
+            <div class="status-badge" id="statusBadge">Scanning...</div>
+        </header>
+
+        <main>
+            <div class="score-card" id="scoreCard">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                    <path class="circle-bg"
+                        d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path class="circle" id="scoreCircle"
+                        stroke-dasharray="0, 100"
+                        d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <text x="18" y="20.35" class="percentage" id="scoreText">--</text>
+                </svg>
+                <div class="score-label">Risk Score</div>
+            </div>
+
+            <div class="details-section">
+                <h3>Analysis Results</h3>
+                <ul id="warningsList" class="warnings-list">
+                    <li class="loading">Analyzing current page...</li>
+                </ul>
+            </div>
+            
+            <div class="feedback-section" id="feedbackSection" style="display: none;">
+                <h3>Was this helpful?</h3>
+                <div class="feedback-buttons">
+                    <button class="btn btn-outline" id="btnSafe">Looks Safe</button>
+                    <button class="btn btn-danger" id="btnScam">Report Scam</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>

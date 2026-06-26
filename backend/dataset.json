@@ -1,0 +1,22 @@
+{
+    "spam": [
+        "urgent verify your account immediately to prevent suspension",
+        "claim your exclusive prize wire transfer required",
+        "unauthorized login attempt detected click here to secure wallet",
+        "you have won the lottery please provide banking details",
+        "your password expires in 24 hours reset now",
+        "crypto giveaway double your bitcoin send to this address",
+        "account restricted validate your identity to restore access",
+        "dear customer your parcel delivery failed pay customs fee",
+        "congratulations you won a million dollars click here to claim"
+    ],
+    "ham": [
+        "welcome to our newsletter here are the top stories today",
+        "your order has been successfully shipped track it here",
+        "meeting notes from yesterday's marketing sync",
+        "how to bake a chocolate cake recipe ingredients",
+        "wikipedia the free encyclopedia that anyone can edit",
+        "contact us for customer support and returns",
+        "latest updates on the upcoming software release notes"
+    ]
+}
