@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Sentinel: Scam & Phishing Detector</title>
+    <meta name="description" content="AI Sentinel uses advanced Naive Bayes Machine Learning and heuristic scanners to detect social engineering and phishing websites in real-time.">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="shield-icon">🛡️</span>
+                <span class="logo-text">AI Sentinel</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#simulator">Live Simulator</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#" class="nav-cta" id="navInstallBtn">Install Extension</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <span class="badge">🔒 Powered by Native Machine Learning</span>
+                <h1 class="hero-title">Browse Safely, Shielded by <span class="gradient-text">Real-Time AI</span></h1>
+                <p class="hero-description">AI Sentinel is a lightweight browser extension that instantly flags social engineering, typosquatted links, and insecure credentials forms before they harvest your data.</p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" id="downloadZipBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                        Download Extension (ZIP)
+                    </button>
+                    <a href="https://chrome.google.com/webstore" target="_blank" class="btn btn-secondary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2zm0 6V4m0 16v-2M4 12h2m12 0h2M7 7l1.5 1.5M15.5 15.5l1.5 1.5M7 17l1.5-1.5M15.5 8.5L17 7"/></svg>
+                        Add to Chrome Store
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="glowing-shield">
+                    <div class="shield-core">🛡️</div>
+                    <div class="ring ring-1"></div>
+                    <div class="ring ring-2"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features Bento Grid -->
+    <section class="features" id="features">
+        <div class="section-header">
+            <h2>Multi-Layered <span class="gradient-text">Scam Shield</span></h2>
+            <p>Our detector evaluates web pages using four advanced defense layers instantly.</p>
+        </div>
+        <div class="bento-grid">
+            <div class="bento-card card-large">
+                <div class="card-icon">🧠</div>
+                <h3>Naive Bayes ML Text Analysis</h3>
+                <p>Scans page text in real-time using natural language processing to identify urgent phrasing, restricted bank alerts, lottery scams, and visual impersonation tactics.</p>
+            </div>
+            <div class="bento-card">
+                <div class="card-icon">🔍</div>
+                <h3>Visual Clone & Typosquatting</h3>
+                <p>Calculates visual Levenshtein distance on domains to prevent spoofed links like <code>paypa1.com</code> or <code>secure-google.com</code>.</p>
+            </div>
+            <div class="bento-card">
+                <div class="card-icon">🚨</div>
+                <h3>Form Hijacking Safeguards</h3>
+                <p>Flags cross-origin form actions, insecure HTTP credential inputs, and excessive hidden variables harvesting autocomplete data.</p>
+            </div>
+            <div class="bento-card card-medium">
+                <div class="card-icon">📊</div>
+                <h3>Personal Anomaly Baseline</h3>
+                <p>Establishes a private domain index. Prompts a warning when you visit high-risk layouts or sites you've never browsed before.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Simulator Section -->
+    <section class="simulator-section" id="simulator">
+        <div class="section-header">
+            <h2>Experience the <span class="gradient-text">Analysis Dashboard</span></h2>
+            <p>Paste a URL or test page content below to see how our engine calculates security risks in real-time.</p>
+        </div>
+        <div class="simulator-container">
+            <!-- Sandbox Inputs -->
+            <div class="sim-inputs">
+                <h3>Analysis Configuration</h3>
+                
+                <div class="input-group">
+                    <label for="simUrl">URL Endpoint</label>
+                    <input type="text" id="simUrl" value="https://paypa1.com" placeholder="e.g., https://yourbank.com">
+                </div>
+
+                <div class="input-group">
+                    <label for="simText">Page Text Snippet</label>
+                    <textarea id="simText" rows="4" placeholder="Paste visible page text here...">Urgent: Verify your account immediately to prevent permanent suspension.</textarea>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="simHidden">Hidden Inputs</label>
+                        <input type="number" id="simHidden" value="4" min="0" max="20">
+                    </div>
+                    <div class="input-group checkbox-group">
+                        <input type="checkbox" id="simCrossOrigin" checked>
+                        <label for="simCrossOrigin">Cross-Origin Form</label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Presets</label>
+                    <div class="presets-row">
+                        <button class="btn btn-preset active" data-preset="scam">🚨 PayPal Typosquat</button>
+                        <button class="btn btn-preset" data-preset="safe">✓ Wikipedia Article</button>
+                        <button class="btn btn-preset" data-preset="insecure">⚠️ Insecure Login Form</button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-block" id="runSimBtn">Analyze Page Configuration</button>
+            </div>
+
+            <!-- Sandbox Output (Dashboard UI Mockup) -->
+            <div class="sim-output">
+                <div class="dashboard-mockup">
+                    <div class="mockup-header">
+                        <div class="mockup-logo">
+                            <span class="mockup-shield">🛡️</span>
+                            <span>AI Sentinel Dashboard</span>
+                        </div>
+                        <div class="mockup-badge danger" id="mockBadge">Scanning...</div>
+                    </div>
+                    <div class="mockup-body">
+                        <div class="mockup-score-card">
+                            <svg viewBox="0 0 36 36" class="circular-chart">
+                                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="circle" id="mockCircle" stroke-dasharray="90, 100" stroke="#ef4444" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <text x="18" y="20.35" class="percentage" id="mockScoreText">90</text>
+                            </svg>
+                            <div class="score-label">Risk Assessment Score</div>
+                        </div>
+                        <div class="mockup-details">
+                            <h4>Risk Indicators & Warnings</h4>
+                            <ul class="warnings-list" id="mockWarningsList">
+                                <li class="danger-item">Visual Clone Detected: Domain 'paypa1' is a typosquat of 'paypal'.</li>
+                                <li class="danger-item">AI Text Analysis detected a 100% probability of scam/phishing language.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Modal -->
+    <div class="modal" id="installModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add AI Sentinel to Your Browser</h3>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-intro">Because browsers block automatic direct installations for security, you can easily load the extension manually in 3 simple steps:</p>
+                
+                <div class="steps-container">
+                    <div class="step-card">
+                        <div class="step-num">1</div>
+                        <h4>Extract ZIP</h4>
+                        <p>Your download of <code>extension.zip</code> has started. Extract/unzip the contents to a folder on your computer.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">2</div>
+                        <h4>Open Extension Page</h4>
+                        <p>Open a new browser tab and navigate to: <br><strong class="url-badge">chrome://extensions</strong> (or equivalent in your browser).</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">3</div>
+                        <h4>Load Unpacked</h4>
+                        <p>Toggle <strong>Developer Mode</strong> (top right) and click <strong>Load Unpacked</strong>. Select the folder you extracted in Step 1.</p>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <a href="extension.zip" download class="btn btn-primary">Re-download ZIP File</a>
+                    <button class="btn btn-secondary" id="finishInstallBtn">I've Installed It!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <p>&copy; 2026 AI Sentinel Project. Open source distribution. Real-time client-side analysis protection.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
