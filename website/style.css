@@ -449,7 +449,8 @@ a {
 }
 
 .dashboard-mockup {
-    width: 360px;
+    width: 100%;
+    max-width: 360px;
     height: 480px;
     background-color: #0f172a;
     border-radius: 16px;
@@ -742,8 +743,12 @@ footer p {
         text-align: center;
         gap: 40px;
     }
+    .hero-title {
+        font-size: 38px;
+    }
     .hero-description {
         margin: 0 auto 35px auto;
+        font-size: 16px;
     }
     .hero-actions {
         justify-content: center;
@@ -759,8 +764,52 @@ footer p {
     }
     .simulator-container {
         grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 30px;
     }
     .steps-container {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 10px 0;
+    }
+    .nav-links a:not(.nav-cta) {
+        display: none; /* Hide descriptive links on mobile to prevent header clutter */
+    }
+    .nav-links {
+        gap: 15px;
+    }
+    .hero {
+        padding: 100px 16px 50px 16px;
+    }
+    .hero-title {
+        font-size: 32px;
+    }
+    .section-header h2 {
+        font-size: 28px;
+    }
+    .bento-card {
+        padding: 24px;
+    }
+    .dashboard-mockup {
+        width: 100%;
+        max-width: 340px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 26px;
+    }
+    .hero-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+    }
+    .hero-actions .btn {
+        width: 100%;
     }
 }
