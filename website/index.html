@@ -92,39 +92,18 @@
         <div class="simulator-container">
             <!-- Sandbox Inputs -->
             <div class="sim-inputs">
-                <h3>Analysis Configuration</h3>
+                <h3>Live URL Scanner</h3>
+                <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">AI Sentinel will dynamically fetch the webpage, scrape its visible text, audit forms, and calculate a real-time risk evaluation.</p>
                 
                 <div class="input-group">
-                    <label for="simUrl">URL Endpoint</label>
-                    <input type="text" id="simUrl" value="https://paypa1.com" placeholder="e.g., https://yourbank.com">
+                    <label for="simUrl">Webpage URL</label>
+                    <input type="text" id="simUrl" value="https://paypa1.com" placeholder="e.g., paypa1.com or https://wikipedia.org" style="font-size: 16px; padding: 14px;">
                 </div>
 
-                <div class="input-group">
-                    <label for="simText">Page Text Snippet</label>
-                    <textarea id="simText" rows="4" placeholder="Paste visible page text here...">Urgent: Verify your account immediately to prevent permanent suspension.</textarea>
-                </div>
-
-                <div class="input-row">
-                    <div class="input-group">
-                        <label for="simHidden">Hidden Inputs</label>
-                        <input type="number" id="simHidden" value="4" min="0" max="20">
-                    </div>
-                    <div class="input-group checkbox-group">
-                        <input type="checkbox" id="simCrossOrigin" checked>
-                        <label for="simCrossOrigin">Cross-Origin Form</label>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <label>Presets</label>
-                    <div class="presets-row">
-                        <button class="btn btn-preset active" data-preset="scam">🚨 PayPal Typosquat</button>
-                        <button class="btn btn-preset" data-preset="safe">✓ Wikipedia Article</button>
-                        <button class="btn btn-preset" data-preset="insecure">⚠️ Insecure Login Form</button>
-                    </div>
-                </div>
-
-                <button class="btn btn-primary btn-block" id="runSimBtn">Analyze Page Configuration</button>
+                <button class="btn btn-primary btn-block" id="runSimBtn" style="padding: 16px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    Scan Webpage Now
+                </button>
             </div>
 
             <!-- Sandbox Output (Dashboard UI Mockup) -->

@@ -101,16 +101,69 @@ document.addEventListener('DOMContentLoaded', () => {
         return 100; // Extreme risk
     }
 
-    function runSimulation() {
-        const url = simUrlInput.value;
-        const text = simTextInput.value;
-        const hiddenInputs = parseInt(simHiddenInput.value, 10) || 0;
-        const crossOrigin = simCrossOriginCheckbox.checked;
+    const API_URL = 'https://ai-integrated-spam-detect.onrender.com/api.php';
 
+    async function runSimulation() {
+        let url = simUrlInput.value.trim();
+        if (!url) return;
+
+        // Auto-prepend https:// if missing
+        if (!/^https?:\/\//i.test(url)) {
+            url = 'https://' + url;
+        }
+
+        // Set scanning state in the UI mockup
+        runSimBtn.disabled = true;
+        runSimBtn.textContent = 'Scanning Webpage...';
+        mockBadge.textContent = 'Scanning...';
+        mockBadge.className = 'mockup-badge warning';
+        mockScoreText.textContent = '--';
+        mockCircle.setAttribute('stroke-dasharray', '0, 100');
+        mockWarningsList.innerHTML = '<li class="safe-item">AI Sentinel is fetching the URL & analyzing content...</li>';
+
+        try {
+            // Fetch API with timeout
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), 8000); // 8s timeout for free tier spin-up
+
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: url }),
+                signal: controller.signal
+            });
+            clearTimeout(id);
+
+            if (!response.ok) throw new Error("API responded with error status");
+            
+            const data = await response.json();
+            
+            // Success! Update UI
+            updateMockupUI(data.riskScore, data.warnings);
+
+        } catch (err) {
+            console.warn("Backend API unavailable or timed out. Falling back to local URL heuristic analysis.", err);
+            
+            // Local Fallback Check
+            const localResults = runLocalHeuristicsOnly(url);
+            updateMockupUI(localResults.riskScore, [
+                ...localResults.warnings,
+                "Note: Free Render server is sleeping. Displaying local URL heuristics scan."
+            ]);
+        } finally {
+            runSimBtn.disabled = false;
+            runSimBtn.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                Scan Webpage Now
+            `;
+        }
+    }
+
+    // Helper: Local fallback checker when server is offline/sleeping
+    function runLocalHeuristicsOnly(url) {
         let riskScore = 0;
         const warnings = [];
 
-        // 1. Domain intelligence
         let host = '';
         try {
             const parsed = new URL(url);
@@ -125,7 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let isTyposquat = false;
 
         for (const brand of popularBrands) {
-            // Brand spoof
             if (hostLower.includes(brand) && !new RegExp("(^|\\.)" + brand + "\\.(com|org|net)$").test(hostLower)) {
                 riskScore += 40;
                 warnings.push(`Domain attempts to spoof the brand: ${brand.charAt(0).toUpperCase() + brand.slice(1)}`);
@@ -133,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             }
 
-            // Levenshtein typosquat
             const domainParts = hostLower.split('.');
             const mainDomain = domainParts.length >= 2 ? domainParts[domainParts.length - 2] : '';
             if (mainDomain && mainDomain !== brand) {
@@ -152,39 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
             warnings.push("URL uses an IP address instead of a domain name.");
         }
 
-        // 2. ML Text scan
-        const textSpamScore = predictTextSpamScore(text);
-        if (textSpamScore > 50) {
-            const mlRisk = Math.min(40, textSpamScore - 50);
-            riskScore += mlRisk;
-            warnings.push(`AI Text Analysis detected a ${textSpamScore}% probability of scam/phishing language.`);
-        }
-
-        // 3. Form audits
-        const textLower = text.toLowerCase();
-        const hasPassword = textLower.includes('password') || textLower.includes('passcode') || textLower.includes('sign in');
-        const hasCreditCard = textLower.includes('card') || textLower.includes('cvv') || textLower.includes('banking');
-
-        if (crossOrigin) {
-            riskScore += 30;
-            warnings.push("Page contains a form that sends data to an entirely different website (Cross-Origin Submit).");
-        }
-
-        if (hiddenInputs > 3) {
-            riskScore += 15;
-            warnings.push("Page contains an unusually high number of hidden input fields (often used to harvest autofill data).");
-        }
-
-        if ((hasPassword || hasCreditCard) && !url.startsWith('https://')) {
-            riskScore += 50;
-            warnings.push("Page requests sensitive information over an insecure (HTTP) connection.");
-        }
-
-        // Normalize
-        riskScore = Math.max(0, Math.min(100, riskScore));
-
-        // Update UI Dashboard Mockup
-        updateMockupUI(riskScore, warnings);
+        return { riskScore, warnings };
     }
 
     function updateMockupUI(score, warnings) {
@@ -227,45 +246,6 @@ document.addEventListener('DOMContentLoaded', () => {
             mockWarningsList.appendChild(li);
         }
     }
-
-    // Preset configurations
-    const presets = {
-        scam: {
-            url: 'https://secure-paypa1-validation.com',
-            text: 'URGENT: Your account access has been restricted. Validate your identity immediately to restore bank access and avoid permanent suspension.',
-            hidden: 4,
-            crossOrigin: true
-        },
-        safe: {
-            url: 'https://wikipedia.org/wiki/Chocolate_Cake',
-            text: 'Welcome to Wikipedia, the free encyclopedia that anyone can edit. Today we are talking about chocolate cake ingredients and cooking release notes.',
-            hidden: 0,
-            crossOrigin: false
-        },
-        insecure: {
-            url: 'http://my-quick-banking-portal.net',
-            text: 'Sign in to access your credit card dashboard. Enter your passcode and verify your security questions.',
-            hidden: 0,
-            crossOrigin: true
-        }
-    };
-
-    presetButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            presetButtons.forEach(p => p.classList.remove('active'));
-            btn.classList.add('active');
-
-            const presetType = btn.getAttribute('data-preset');
-            const data = presets[presetType];
-
-            simUrlInput.value = data.url;
-            simTextInput.value = data.text;
-            simHiddenInput.value = data.hidden;
-            simCrossOriginCheckbox.checked = data.crossOrigin;
-
-            runSimulation();
-        });
-    });
 
     // Run scanner simulation
     runSimBtn.addEventListener('click', runSimulation);

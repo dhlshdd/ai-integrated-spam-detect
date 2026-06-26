@@ -187,7 +187,7 @@ const server = http.createServer((req, res) => {
         body += chunk.toString();
     });
 
-    req.on('end', () => {
+    req.on('end', async () => {
         let data;
         try {
             data = JSON.parse(body);
@@ -223,11 +223,97 @@ const server = http.createServer((req, res) => {
             return;
         }
 
-        const url = data.url;
-        const text = data.text || '';
-        const forms = data.forms || [];
-        const hiddenInputs = data.hiddenInputs || 0;
-        const crossOriginForms = data.crossOriginForms || false;
+        let url = data.url;
+        // Auto-prepend protocol if missing
+        if (!/^https?:\/\//i.test(url)) {
+            url = 'https://' + url;
+        }
+
+        let text = data.text || '';
+        let forms = data.forms || [];
+        let hiddenInputs = data.hiddenInputs || 0;
+        let crossOriginForms = data.crossOriginForms || false;
+
+        // If page content is missing, scrape the website in the background
+        if (!text && forms.length === 0 && !crossOriginForms && hiddenInputs === 0) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s timeout
+
+                const fetchRes = await fetch(url, {
+                    signal: controller.signal,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AI-Sentinel-Scanner/1.0'
+                    }
+                });
+                clearTimeout(timeoutId);
+
+                if (fetchRes.ok) {
+                    const html = await fetchRes.text();
+
+                    // Extract visible page text
+                    let cleanText = html.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, '');
+                    cleanText = cleanText.replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, '');
+                    cleanText = cleanText.replace(/<[^>]+>/g, ' ');
+                    text = cleanText.replace(/\s+/g, ' ').trim().substring(0, 10000);
+
+                    // Audit forms
+                    const formRegex = /<form[^>]*>([\s\S]*?)<\/form>/gi;
+                    const inputRegex = /<input[^>]*>/gi;
+                    const typeRegex = /type\s*=\s*["']?([^"'\s>]+)/i;
+                    const nameRegex = /name\s*=\s*["']?([^"'\s>]+)/i;
+                    const placeholderRegex = /placeholder\s*=\s*["']?([^"'\s>]+)/i;
+                    const actionRegex = /action\s*=\s*["']?([^"'\s>]+)/i;
+
+                    let formMatch;
+                    let currentOrigin = '';
+                    try {
+                        currentOrigin = new URL(url).origin;
+                    } catch (e) {}
+
+                    while ((formMatch = formRegex.exec(html)) !== null) {
+                        const formContent = formMatch[1];
+                        const formTag = formMatch[0];
+
+                        const actionMatch = formTag.match(actionRegex);
+                        if (actionMatch && actionMatch[1].startsWith('http')) {
+                            try {
+                                if (new URL(actionMatch[1]).origin !== currentOrigin) {
+                                    crossOriginForms = true;
+                                }
+                            } catch (e) {}
+                        }
+
+                        let hasPassword = false;
+                        let hasCreditCard = false;
+
+                        let inputMatch;
+                        while ((inputMatch = inputRegex.exec(formContent)) !== null) {
+                            const inputTag = inputMatch[0];
+                            const typeMatch = inputTag.match(typeRegex);
+                            const type = typeMatch ? typeMatch[1].toLowerCase() : '';
+
+                            if (type === 'hidden' || inputTag.includes('display:none') || inputTag.includes('display: none') || inputTag.includes('opacity:0') || inputTag.includes('opacity: 0')) {
+                                hiddenInputs++;
+                            }
+                            if (type === 'password') {
+                                hasPassword = true;
+                            }
+
+                            const nameMatch = inputTag.match(nameRegex) || '';
+                            const placeholderMatch = inputTag.match(placeholderRegex) || '';
+                            const inputStr = (inputTag + nameMatch + placeholderMatch).toLowerCase();
+                            if (inputStr.includes('card') || inputStr.includes('cvv') || inputStr.includes('holder')) {
+                                hasCreditCard = true;
+                            }
+                        }
+                        forms.push({ hasPassword, hasCreditCard });
+                    }
+                }
+            } catch (err) {
+                console.error(`Page scraping bypassed for ${url} (Reason: ${err.message})`);
+            }
+        }
 
         let riskScore = 0;
         const warnings = [];
