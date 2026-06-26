@@ -2,6 +2,99 @@
 const API_URL = 'https://ai-integrated-spam-detect.onrender.com/api.php';
 // const API_URL = 'http://localhost:8000/api.php';
 const tabData = {};
+const sessionBypassWhitelist = new Set();
+
+// Helper: Levenshtein distance
+function levenshtein(a, b) {
+    const tmp = [];
+    const alen = a.length;
+    const blen = b.length;
+    if (alen === 0) return blen;
+    if (blen === 0) return alen;
+    for (let i = 0; i <= alen; i++) tmp[i] = [i];
+    for (let j = 0; j <= blen; j++) tmp[0][j] = j;
+    for (let i = 1; i <= alen; i++) {
+        for (let j = 1; j <= blen; j++) {
+            tmp[i][j] = Math.min(
+                tmp[i - 1][j] + 1,
+                tmp[i][j - 1] + 1,
+                tmp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+            );
+        }
+    }
+    return tmp[alen][blen];
+}
+
+// Helper: Check local URL heuristics
+function checkUrlHeuristics(url) {
+    const domain = extractDomain(url);
+    if (!domain) return null;
+
+    const domainLower = domain.toLowerCase();
+    
+    // Ignore local development
+    if (domainLower === 'localhost' || domainLower === '127.0.0.1' || domainLower.startsWith('192.168.')) {
+        return null;
+    }
+
+    const popularBrands = ['paypal', 'google', 'facebook', 'microsoft', 'apple', 'amazon', 'netflix', 'chase', 'bankofamerica'];
+    
+    for (const brand of popularBrands) {
+        // Brand spoof
+        if (domainLower.includes(brand) && !new RegExp("(^|\\.)" + brand + "\\.(com|org|net)$").test(domainLower)) {
+            return `Domain attempts to spoof the brand: ${brand.charAt(0).toUpperCase() + brand.slice(1)}`;
+        }
+
+        // Levenshtein typosquat
+        const domainParts = domainLower.split('.');
+        const mainDomain = domainParts.length >= 2 ? domainParts[domainParts.length - 2] : '';
+        if (mainDomain && mainDomain !== brand) {
+            const distance = levenshtein(mainDomain, brand);
+            if (distance > 0 && distance <= 2 && mainDomain.length > 4) {
+                return `Visual Clone Detected: Domain '${mainDomain}' is a typosquat of '${brand}'.`;
+            }
+        }
+    }
+
+    // IP address validation
+    const ipv4Regex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+    if (ipv4Regex.test(domain)) {
+        const isValidIp = domain.split('.').every(part => {
+            const num = parseInt(part, 10);
+            return num >= 0 && num <= 255;
+        });
+        if (isValidIp) {
+            return "URL uses an IP address instead of a domain name.";
+        }
+    }
+
+    return null;
+}
+
+// Intercept navigations before page loading
+chrome.webNavigation.onBeforeNavigate.addListener((details) => {
+    if (details.frameId !== 0) return; // Only main frame
+
+    const url = details.url;
+    if (url.startsWith('chrome://') || url.startsWith('chrome-extension://') || url.startsWith('about:')) {
+        return;
+    }
+
+    const domain = extractDomain(url);
+    if (!domain) return;
+
+    if (sessionBypassWhitelist.has(domain)) {
+        return;
+    }
+
+    const alertReason = checkUrlHeuristics(url);
+    if (alertReason) {
+        const blockedUrl = chrome.runtime.getURL(`blocked.html?url=${encodeURIComponent(url)}&reason=${encodeURIComponent(alertReason)}`);
+        chrome.tabs.update(details.tabId, { url: blockedUrl });
+    }
+});
+
+// Helper: Extract domain from URL
 
 // Helper: Extract domain from URL
 function extractDomain(url) {
@@ -118,6 +211,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }).catch(() => {
             sendResponse({ success: false });
         });
+        return true;
+    }
+
+    if (request.action === 'bypassBlock') {
+        const domain = extractDomain(request.url);
+        if (domain) {
+            sessionBypassWhitelist.add(domain);
+            sendResponse({ success: true });
+        }
         return true;
     }
 });

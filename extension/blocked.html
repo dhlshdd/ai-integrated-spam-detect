@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deceptive Page Blocked - AI Sentinel</title>
+    <link rel="stylesheet" href="blocked.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="block-container">
+        <div class="warning-header">
+            <span class="warning-icon">⚠️</span>
+            <h1>Deceptive Page Blocked</h1>
+            <p class="subtitle">AI Sentinel Proactive Link Interceptor</p>
+        </div>
+
+        <div class="warning-details">
+            <p><strong>URL:</strong> <span id="blockedUrl" class="url-text">Loading...</span></p>
+            <p><strong>Reason:</strong> <span id="blockedReason" class="reason-text">Loading...</span></p>
+        </div>
+
+        <div class="warning-description">
+            <p>AI Sentinel has blocked this link to protect your security. Scammers often distribute malicious links that execute exploits or steal your autofill data the moment they are loaded. Accessing this site is highly discouraged.</p>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-safe" id="goBackBtn">Go Back to Safety</button>
+            <div class="advanced-section">
+                <a href="#" id="toggleAdvanced">Advanced Options</a>
+                <div class="advanced-content" id="advancedContent" style="display: none;">
+                    <p>If you trust this site and are sure this warning is a false positive, you can temporarily whitelist this domain for your current session.</p>
+                    <button class="btn btn-unsafe" id="proceedBtn">Proceed Anyway (Unsafe)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="blocked.js"></script>
+</body>
+</html>
