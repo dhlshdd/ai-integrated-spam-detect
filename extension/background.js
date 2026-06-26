@@ -1,6 +1,6 @@
 // Change this to your public deployed server URL (e.g. on Render/Railway) in production:
-// const API_URL = 'https://your-deployed-app.onrender.com/api.php';
-const API_URL = 'http://localhost:8000/api.php';
+const API_URL = 'https://ai-integrated-spam-detect.onrender.com/api.php';
+// const API_URL = 'http://localhost:8000/api.php';
 const tabData = {};
 
 // Helper: Extract domain from URL
